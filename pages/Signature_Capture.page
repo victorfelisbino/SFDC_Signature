@@ -1,0 +1,106 @@
+<apex:page controller="SignatureComponentController" showHeader="false" docType="html-5.0" standardStylesheets="false" >
+    <apex:includeScript value="/support/console/42.0/integration.js"/>
+    <meta charset="utf-8" />
+    <title>Signature Capture</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />   
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <apex:includeScript value="{!URLFOR($Resource.jquery)}"  />
+    <apex:stylesheet value="{!URLFOR($Resource.Signature, 'css/signature-pad.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Signature, 'js/signature_pad.umd.js')}"/>
+    
+    <div id="signature-pad" class="signature-pad">
+        <div class="signature-pad--body">
+            <canvas></canvas>
+        </div>
+        <div class="signature-pad--footer">
+            <div id="desc" class="description">Sign above</div>
+            
+            <div class="signature-pad--actions" id="buttons">
+                <div>
+                    <button type="button" class="button clear" data-action="clear">Clear</button>         
+                </div>
+                <div>
+                    <button type="button" class="button save" data-action="save-png">OK</button>
+                </div>
+            </div>
+            <div id="loading" style="display:none;">
+                <apex:image url="https://i.stack.imgur.com/pK4a5.gif" height="50"/>
+            </div>
+            <div id="message" style="display:none;">
+                Signature accepted!
+            </div>
+        </div>
+    </div>
+    <script>
+    var parentId = '{!objParentId}';
+    var wrapper = document.getElementById("signature-pad");
+    var clearButton = wrapper.querySelector("[data-action=clear]");
+    var savePNGButton = wrapper.querySelector("[data-action=save-png]");
+    var canvas = wrapper.querySelector("canvas");
+    var signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)'
+    });
+    
+    function resizeCanvas() {
+        var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.clear();
+    }
+    window.onresize = resizeCanvas;
+    resizeCanvas();
+    
+    function dataURLToBlob(dataURL) {
+        // Code taken from https://github.com/ebidel/filer.js
+        var parts = dataURL.split(';base64,');
+        var contentType = parts[0].split(":")[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+        var uInt8Array = new Uint8Array(rawLength);
+        for (var i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        
+        return new Blob([uInt8Array], { type: contentType });
+    }
+    
+    clearButton.addEventListener("click", function (event) {
+        signaturePad.clear();
+    });
+    
+    window._getPicture = (function(){
+        return {
+            url : function(){
+                return signaturePad.toDataURL();
+            }
+        };
+    });
+    
+    savePNGButton.addEventListener("click", function (event) {
+        $('#buttons').hide();
+        $('#desc').hide();
+        $('#loading').show();
+        if (signaturePad.isEmpty()) {
+            alert("Please provide a signature first.");
+        } else {
+            var strDataURI = signaturePad.toDataURL();
+            strDataURI = strDataURI.replace(/^data:image\/(png|jpg);base64,/, "");
+            console.log(strDataURI);
+            SignatureComponentController.saveSignature(strDataURI,parentId, handleResult);
+        }
+    });
+    function handleResult(result,event) {
+        $('#loading').hide();
+        $('#message').show();
+        //sforce.console.getFocusedPrimaryTabId(showTabId);
+        //var showTabId = function showTabId(result) {
+        //    sforce.console.refreshPrimaryTabById(result.id, true,null);
+        //};
+        
+    }
+    
+    </script>
+    
+</apex:page>

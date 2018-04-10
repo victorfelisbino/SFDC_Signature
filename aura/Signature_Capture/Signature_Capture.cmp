@@ -1,0 +1,41 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <!--Use "slds-m-around- -xx-large" class to add standard Large padding to the component--> 
+    <div class="slds-card">
+        <div class="slds-card__header slds-grid">
+
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <button class="slds-button slds-button--brand" onclick="{!c.openModel}">Capture Signature</button>  
+            
+            <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+            <aura:if isTrue="{!v.isOpen}">
+                
+                <!--###### MODAL BOX Start From Here ######--> 
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                        <div class="slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="header99" class="slds-text-heading--medium">Signature</h2>
+                        </div>
+                        <!--###### MODAL BOX BODY Part Start From Here ######-->
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <iframe src="{!'https://loves--devsup--c.cs50.visual.force.com/apex/Signature_Capture?id=' + v.recordId }" width="100%" height="500px;" frameBorder="0"/>
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Close</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+                <!--###### MODAL BOX Part END Here ######-->
+                
+            </aura:if>
+        </div>
+    </div>
+    </aura:component>
