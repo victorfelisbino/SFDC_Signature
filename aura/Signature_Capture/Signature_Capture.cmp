@@ -25,7 +25,7 @@
                         </div>
                         <!--###### MODAL BOX BODY Part Start From Here ######-->
                         <div class="slds-modal__content slds-p-around--medium">
-                            <iframe src="{!'https://loves--devsup--c.cs50.visual.force.com/apex/Signature_Capture?id=' + v.recordId }" width="100%" height="500px;" frameBorder="0"/>
+                            <iframe src="{!'/apex/Signature_Capture?id=' + v.recordId }" width="100%" height="500px;" frameBorder="0"/>
                         </div>
                         <div class="slds-modal__footer">
                             <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Close</button>
